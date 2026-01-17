@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  ml-pipeline:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev  # Use development Dockerfile
+    container_name: ride-hailing-dev
+    volumes:
+      - ./src:/app/src
+      - ./data:/app/data
+      - ./artifacts:/app/artifacts
+      - ./logs:/app/logs
+      - ./notebooks:/app/notebooks
+      - ./tests:/app/tests
+      - ./scripts:/app/scripts
+    environment:
+      - ENVIRONMENT=development
+      - PYTHONPATH=/app/src
+    stdin_open: true
+    tty: true
+    command: tail -f /dev/null  # Keep container running
+
+  jupyter:
+    build:
+      context: .
+      dockerfile: Dockerfile.jupyter
+    container_name: ride-hailing-jupyter-dev
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./notebooks:/home/jovyan/notebooks
+      - ./src:/home/jovyan/src
+      - ./data:/home/jovyan/data
+    environment:
+      - JUPYTER_TOKEN=development
+    restart: unless-stopped

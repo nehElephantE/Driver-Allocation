@@ -1,0 +1,48 @@
+# .dockerignore
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data files (will be mounted at runtime)
+data/
+artifacts/
+logs/
+
+# Test and build artifacts
+*.egg-info/
+dist/
+build/
+
+# Docker files
+Dockerfile.dev
+docker-compose.*.yml
+
+# Documentation
+docs/_build/
+
+# Notebook checkpoints
+.ipynb_checkpoints

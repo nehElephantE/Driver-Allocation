@@ -1,0 +1,135 @@
+version: '3.8'
+
+services:
+  # Main ML Pipeline Service
+  ml-pipeline:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ride-hailing-ml-pipeline
+    volumes:
+      # Mount data directories
+      - ./data:/app/data
+      # Mount artifacts directory
+      - ./artifacts:/app/artifacts
+      # Mount logs directory
+      - ./logs:/app/logs
+      # Optional: Mount notebooks for development
+      - ./notebooks:/app/notebooks:ro
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PYTHONDONTWRITEBYTECODE=1
+      # Add any other environment variables from config.yaml
+    env_file:
+      - .env  # Optional: for sensitive environment variables
+    command: python main.py --mode all
+    restart: "no"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - ml-network
+
+  # Jupyter Notebook for development/exploration
+  jupyter:
+    image: jupyter/datascience-notebook:latest
+    container_name: ride-hailing-jupyter
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./notebooks:/home/jovyan/work
+      - ./data:/home/jovyan/data
+      - ./src:/home/jovyan/src
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+      - CHOWN_HOME=yes
+      - CHOWN_HOME_OPTS=-R
+    command: start-notebook.sh --NotebookApp.token='' --NotebookApp.password=''
+    restart: unless-stopped
+    networks:
+      - ml-network
+
+  # MLflow for experiment tracking (optional)
+  mlflow:
+    image: python:3.9-slim
+    container_name: ride-hailing-mlflow
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./artifacts:/app/artifacts
+      - ./mlflow:/app/mlflow
+    environment:
+      - MLFLOW_TRACKING_URI=http://localhost:5000
+      - MLFLOW_S3_ENDPOINT_URL=http://minio:9000
+    command: >
+      sh -c "pip install mlflow boto3 &&
+             mlflow server --backend-store-uri sqlite:///mlflow.db \
+             --default-artifact-root /app/artifacts/mlflow \
+             --host 0.0.0.0"
+    depends_on:
+      - ml-pipeline
+    restart: unless-stopped
+    networks:
+      - ml-network
+
+  # MinIO for artifact storage (optional)
+  minio:
+    image: minio/minio:latest
+    container_name: ride-hailing-minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+    volumes:
+      - ./minio_data:/data
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - ml-network
+
+  # PostgreSQL for storing experiment results (optional)
+  postgres:
+    image: postgres:13
+    container_name: ride-hailing-postgres
+    environment:
+      - POSTGRES_DB=ml_experiments
+      - POSTGRES_USER=ml_user
+      - POSTGRES_PASSWORD=ml_password
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ml_user"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - ml-network
+
+# Custom network for all services
+networks:
+  ml-network:
+    driver: bridge
+    name: ride-hailing-network
+
+# Named volumes for persistent data
+volumes:
+  minio_data:
+    driver: local
+  postgres_data:
+    driver: local
+  mlflow_data:
+    driver: local

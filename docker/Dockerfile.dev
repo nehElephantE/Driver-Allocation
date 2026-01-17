@@ -1,0 +1,56 @@
+# Development Dockerfile
+FROM python:3.9-slim
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONPATH=/app/src
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    build-essential \
+    curl \
+    wget \
+    git \
+    vim \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python development tools
+RUN pip install --upgrade pip && \
+    pip install \
+    jupyter \
+    jupyterlab \
+    ipython \
+    black \
+    flake8 \
+    pylint \
+    mypy \
+    pytest \
+    pytest-cov \
+    notebook
+
+# Copy requirements
+COPY requirements.txt .
+
+# Install project dependencies
+RUN pip install -r requirements.txt
+
+# Create app directory
+WORKDIR /app
+
+# Copy project files
+COPY . .
+
+# Create necessary directories
+RUN mkdir -p \
+    /app/data/raw \
+    /app/data/processed \
+    /app/data/interim \
+    /app/artifacts \
+    /app/logs \
+    /app/notebooks
+
+# Default command (interactive shell)
+CMD ["/bin/bash"]

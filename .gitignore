@@ -1,0 +1,209 @@
+# ================================
+# PYTHON
+# ================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# pyenv
+.python-version
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# ================================
+# DATA & MODEL FILES
+# ================================
+
+# Raw data files (keep structure but ignore actual data files)
+data/raw/*.csv
+data/raw/*.parquet
+data/raw/*.json
+data/raw/*.txt
+data/raw/*.xlsx
+data/raw/*.xls
+
+# Processed data files
+data/processed/
+data/interim/
+!data/processed/.gitkeep
+!data/interim/.gitkeep
+
+# Artifacts (models, features, metrics, predictions)
+artifacts/
+!artifacts/.gitkeep
+
+# ================================
+# ENVIRONMENT & CONFIGURATION
+# ================================
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Virtual environments
+venv/
+env/
+.venv/
+ENV/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# VS Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Spyder
+.spyderproject
+.spyproject
+
+# ================================
+# LOGS
+# ================================
+
+# Log files
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ================================
+# OPERATING SYSTEM FILES
+# ================================
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+# ================================
+# PROJECT SPECIFIC
+# ================================
+
+# Output files from your pipeline
+order_driver_pairs.csv
+detailed_predictions.csv
+trained_model.pkl
+feature_engineer.pkl
+model_metrics.json
+model_metrics.csv
+training_results.png
+prediction_statistics.json
+
+# Temporary files
+*.tmp
+*.temp
+*~
+
+# Backups
+*.bak
+*.backup
+
+# ================================
+# NOTEBOOKS (Optional - uncomment if you want to ignore notebooks)
+# ================================
+
+# Jupyter notebooks
+# notebooks/*.ipynb
+
+# ================================
+# DOCKER
+# ================================
+
+# Docker
+docker-compose.override.yml
+
+# ================================
+# MISC
+# ================================
+
+# Secrets
+secrets.yml
+secrets.yaml
+
+# Large files that shouldn't be in Git
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+
+# Custom
+.custom
