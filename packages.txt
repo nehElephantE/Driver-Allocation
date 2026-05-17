@@ -1,4 +1,0 @@
-echo "# System dependencies for Streamlit Cloud
-build-essential
-gcc
-g++" > packages.txt
