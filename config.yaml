@@ -4,7 +4,7 @@ project:
   version: "1.0.0"
   description: "ML Pipeline for Ride-Hailing Driver-Order Matching"
 
-# Data paths
+# Data paths - Modified for Streamlit Cloud (read-only, no disk writes)
 data:
   raw:
     booking: "data/raw/booking.csv"
@@ -15,13 +15,15 @@ data:
     test: "data/processed/test_data.parquet"
     features: "data/processed/features.parquet"
   interim: "data/interim/"
+  # For Streamlit Cloud - use in-memory or session state
+  use_memory_storage: true
   
 # Feature engineering
 features:
   time_features: true
   distance_features: true
   gps_features: true
-  historical_features: true
+  historical_features: false  # Disabled for demo (requires persistent storage)
   interaction_features: true
   
 # Model configuration
@@ -29,22 +31,23 @@ model:
   random_seed: 42
   test_size: 0.2
   validation_size: 0.1
-  models_to_train: ["random_forest", "xgboost", "lightgbm"]
+  models_to_train: ["random_forest"]  # Reduced for demo (xgboost/lightgbm optional)
+  use_demo_model: true  # Use built-in demo model for Streamlit Cloud
   
 # Random Forest parameters
 random_forest:
-  n_estimators: 200
-  max_depth: 15
+  n_estimators: 100  # Reduced for faster loading
+  max_depth: 10
   min_samples_split: 10
   min_samples_leaf: 5
   random_state: 42
   class_weight: "balanced"
   n_jobs: -1
   
-# XGBoost parameters
+# XGBoost parameters (optional - for local training only)
 xgboost:
-  n_estimators: 200
-  max_depth: 8
+  n_estimators: 100
+  max_depth: 6
   learning_rate: 0.05
   subsample: 0.8
   colsample_bytree: 0.8
@@ -52,10 +55,10 @@ xgboost:
   eval_metric: "logloss"
   n_jobs: -1
   
-# LightGBM parameters
+# LightGBM parameters (optional - for local training only)
 lightgbm:
-  n_estimators: 200
-  max_depth: 8
+  n_estimators: 100
+  max_depth: 6
   learning_rate: 0.05
   subsample: 0.8
   colsample_bytree: 0.8
@@ -64,7 +67,7 @@ lightgbm:
   
 # Training configuration
 training:
-  cv_folds: 5
+  cv_folds: 3  # Reduced for demo
   scoring_metric: "roc_auc"
   early_stopping_rounds: 50
   use_gpu: false
@@ -72,9 +75,9 @@ training:
 # Prediction configuration
 prediction:
   threshold: 0.5
-  batch_size: 1000
+  batch_size: 100
   
-# Output configuration
+# Output configuration - Modified for Streamlit Cloud (no disk writes)
 output:
   models_dir: "artifacts/models/"
   features_dir: "artifacts/features/"
@@ -82,15 +85,19 @@ output:
   predictions_dir: "artifacts/predictions/"
   required_output: "order_driver_pairs.csv"
   detailed_output: "detailed_predictions.csv"
+  # For Streamlit Cloud - use session state instead of files
+  use_session_state: true
   
-# Monitoring
+# Monitoring - Disabled for demo
 monitoring:
-  enable_drift_detection: true
+  enable_drift_detection: false
   drift_threshold: 0.1
   retrain_frequency: "weekly"
   
-# Logging
+# Logging - Reduced for Streamlit Cloud
 logging:
-  level: "INFO"
+  level: "WARNING"  # Changed from INFO to reduce log spam
   file: "logs/pipeline.log"
   format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  # For Streamlit Cloud - log to console only
+  console_only: true

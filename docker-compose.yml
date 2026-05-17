@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  # Production service
+  ride-hailing-ml:
+    build: .
+    container_name: ride-hailing-ml
+    ports:
+      - "8501:8501"
+    volumes:
+      # Only mount if these directories exist (optional for demo)
+      - ./data:/app/data:ro
+      - ./artifacts:/app/artifacts:ro
+      - ./logs:/app/logs
+    environment:
+      - PYTHONPATH=/app
+      - STREAMLIT_SERVER_PORT=8501
+      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Development with hot-reload (mounts entire project)
+  dev:
+    build: .
+    container_name: ride-hailing-ml-dev
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./:/app
+    environment:
+      - PYTHONPATH=/app
+      - STREAMLIT_SERVER_PORT=8501
+      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
+    command: streamlit run app.py --server.port=8501 --server.address=0.0.0.0 --server.runOnSave true
+
+  # Jupyter notebook service (optional - create notebooks folder first)
+  jupyter:
+    build: .
+    container_name: ride-hailing-jupyter
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./:/app
+      - ./notebooks:/app/notebooks
+    environment:
+      - PYTHONPATH=/app
+    working_dir: /app/notebooks
+    command: jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --allow-root --NotebookApp.token=''
+    profiles:
+      - dev
+      - jupyter

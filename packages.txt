@@ -1,0 +1,4 @@
+echo "build-essential
+gcc
+g++
+" > packages.txt
